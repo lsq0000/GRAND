@@ -2,8 +2,17 @@ Package: GRAND
 Type: Package
 Title: Graph Release with Assured Node Differential Privacy
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Authors@R: c(
+    person("Suqing", "Liu", 
+           email = "liusuqing0123@uchicago.edu", 
+           role = c("aut", "cre")),
+    person("Xuan", "Bi", 
+           email = "xbi@umn.edu", 
+           role = "aut"),
+    person("Tianxi", "Li", 
+           email = "tianxili@umn.edu", 
+           role = "aut")
+)
 Description: Implements the GRAND (Graph Release with Assured Node Differential Privacy) 
     method for privatizing network data using differential privacy. The package provides 
     functions for generating synthetic networks, applying differential privacy to network 
