@@ -13,7 +13,7 @@ GRAND (Graph Release with Assured Node Differential Privacy) is an R package tha
 install.packages("devtools")
 
 # Install GRAND from GitHub
-devtools::install_github("yourusername/GRAND")
+devtools::install_github("lsq0000/GRAND")
 ```
 
 ### Dependencies
