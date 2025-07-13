@@ -69,7 +69,7 @@ Generates a random network following the Latent Space Model (LSM) with specified
 **Returns**: A list containing:
 - `A`: Adjacency matrix of the generated network
 - `g`: Community assignments for each node
-- `P`: Probability matrix
+- `P`: Probability matrix of the generated network
 - `alpha`: Node-specific intercept parameters
 - `Z`: Latent positions in k-dimensional space
 

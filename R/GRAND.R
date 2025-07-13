@@ -44,7 +44,7 @@ Add.Laplace <- function(X, eps = 1) {
 #' \itemize{
 #'   \item A: Adjacency matrix of the generated network
 #'   \item g: Community assignments for each node
-#'   \item P: Probability matrix
+#'   \item P: Probability matrix of the generated network
 #'   \item alpha: Node-specific intercept parameters
 #'   \item Z: Latent positions in k-dimensional space
 #' }
