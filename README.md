@@ -68,10 +68,11 @@ Generates a random network following the Latent Space Model (LSM) with specified
 
 **Returns**: A list containing:
 - `A`: Adjacency matrix of the generated network
-- `g`: Community assignments for each node
+- `g`: Graph object of the generated network
 - `P`: Probability matrix of the generated network
 - `alpha`: Node-specific intercept parameters
 - `Z`: Latent positions in k-dimensional space
+- `idx`: Community assignments for each node
 
 ### `GRAND.privatize(A, K, idx, eps = 1, oracle.dt = NULL, model = "LSM", niter = 500, rho = 0.05)`
 Applies the GRAND (Graph Release with Assured Node Differential Privacy) method to privatize network data using differential privacy.

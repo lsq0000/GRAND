@@ -43,10 +43,11 @@ Add.Laplace <- function(X, eps = 1) {
 #' @return A list containing:
 #' \itemize{
 #'   \item A: Adjacency matrix of the generated network
-#'   \item g: Community assignments for each node
+#'   \item g: Graph object of the generated network
 #'   \item P: Probability matrix of the generated network
 #'   \item alpha: Node-specific intercept parameters
 #'   \item Z: Latent positions in k-dimensional space
+#'   \item idx: Community assignments for each node
 #' }
 #' @export
 #' @examples
@@ -90,8 +91,10 @@ LSM.Gen <- function(n, k, K, avg.d = NULL) {
   A[upper.index] <- upper.A
   A <- A + t(A)
   diag(A) <- 0
+  
+  g <- graph.adjacency(A, "undirected")
 
-  return(list(A = A, g = idx, P = P, alpha = alpha, Z = Z))
+  return(list(A = A, g = g, P = P, alpha = alpha, Z = Z, idx = idx))
 }
 
 GRAND.one.node <- function(A, given.index, new.index, given.Z, given.alpha = NULL, model = c("LSM", "RDPG")) {
