@@ -130,13 +130,21 @@ GPL (>= 3)
 
 If you use GRAND in your research, please cite:
 
-```
-@misc{grand2024,
+```bibtex
+@misc{liu2025grand,
   title={GRAND: Graph Release with Assured Node Differential Privacy},
-  author={Your Name},
-  year={2024},
-  howpublished={R package}
+  author={Suqing Liu and Xuan Bi and Tianxi Li},
+  year={2025},
+  eprint={2507.00402},
+  archivePrefix={arXiv},
+  primaryClass={stat.ML},
+  url={https://arxiv.org/abs/2507.00402}
 }
+```
+
+Or in text format:
+```
+S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. arXiv preprint arXiv:2507.00402, 2025.
 ```
 
 ## Issues and Contributions
