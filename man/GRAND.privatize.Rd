@@ -9,7 +9,6 @@ GRAND.privatize(
   K,
   idx,
   eps = 1,
-  oracle.dt = NULL,
   model = c("LSM", "RDPG"),
   niter = 500,
   rho = 0.05
@@ -24,8 +23,6 @@ GRAND.privatize(
 
 \item{eps}{Numeric or vector. Privacy budget parameter(s) for differential privacy. Default is 1.}
 
-\item{oracle.dt}{List. Optional oracle data containing true parameters for comparison. Default is NULL.}
-
 \item{model}{Character. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".}
 
 \item{niter}{Integer. Number of iterations for the optimization algorithm. Default is 500.}
@@ -36,10 +33,9 @@ GRAND.privatize(
 A list containing:
 \itemize{
   \item non.private.result: Results without privacy (original and estimated data)
-  \item GRAND.result: Results from GRAND privatization method
-  \item Laplace.result: Results from baseline Laplace mechanism
-  \item eps: Privacy parameters used
-  \item oracle.result: Oracle comparison results (if oracle.dt provided)
+  \item GRAND.result: List with one element per epsilon value. Each element contains privatization results for that specific epsilon
+  \item Laplace.result: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
+  \item eps: Vector of privacy parameters used
 }
 }
 \description{
@@ -52,7 +48,17 @@ GRAND: Graph Release with Assured Node Differential Privacy
 }
 \examples{
 # Generate a sample network
-net <- LSM.Gen(n = 1000, k = 2, K = 3)
-# Privatize the first 500 nodes with epsilon = 1
-result <- GRAND.privatize(A = net$A, K = 2, idx = 1:500, eps = 1)
+dt <- LSM.Gen(n = 500, k = 2, K = 3)
+# Privatize the first 250 nodes with epsilon = 1, 2, 5, 10
+result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
+}
+\references{
+P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
+  Journal of the American Statistical Association, 97(460):1090–1098, 2002.
+  
+  S. J. Young and E. R. Scheinerman. Random dot product graph models for social networks. 
+  In International Workshop on Algorithms and Models for the Web-Graph, pages 138–149. Springer, 2007.
+  
+  S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
+  arXiv preprint arXiv:2507.00402, 2025.
 }

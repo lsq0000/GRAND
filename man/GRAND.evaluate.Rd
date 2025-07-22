@@ -24,7 +24,6 @@ A data frame containing evaluation results with columns:
   \item Hat2: Wasserstein distance for holdout set estimation
   \item GRAND: Wasserstein distance for GRAND privatization
   \item Laplace: Wasserstein distance for Laplace mechanism
-  \item Oracle: Wasserstein distance for oracle method (if available)
 }
 }
 \description{
@@ -37,10 +36,14 @@ Evaluate GRAND Results
 }
 \examples{
 # Generate and privatize a network
-net <- LSM.Gen(n = 1000, k = 2, K = 3)
-result <- GRAND.privatize(A = net$A, K = 2, idx = 1:500, eps = c(0.5, 1.0))
+dt <- LSM.Gen(n = 500, k = 2, K = 3)
+result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
 # Evaluate results for all statistics
 eval_results <- GRAND.evaluate(result)
 # Evaluate only degree and triangle statistics
 eval_results <- GRAND.evaluate(result, statistics = c("degree", "triangle"))
+}
+\references{
+S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
+  arXiv preprint arXiv:2507.00402, 2025.
 }

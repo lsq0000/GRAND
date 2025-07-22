@@ -19,21 +19,43 @@ LSM.Gen(n, k, K, avg.d = NULL)
 A list containing:
 \itemize{
   \item A: Adjacency matrix of the generated network
-  \item g: Community assignments for each node
-  \item P: Probability matrix
+  \item g: Graph object of the generated network
+  \item P: Probability matrix of the generated network
   \item alpha: Node-specific intercept parameters
   \item Z: Latent positions in k-dimensional space
+  \item idx: Community assignments for each node
 }
 }
 \description{
 Generates a random network following the Latent Space Model (LSM) with specified parameters.
+  The LSM assumes that each node has a latent position in a k-dimensional space, and edge probabilities
+  depend on the distances between these latent positions.
 }
 \details{
 Generate Latent Space Model Network
+
+
+  The Latent Space Model generates networks based on the following process:
+  \enumerate{
+    \item Node-specific intercept parameters: \code{alpha[i] ~ Uniform(1, 3)}, then transformed as \code{alpha[i] = -alpha[i]/2}
+    \item Community assignments: Each node is randomly assigned to one of K communities with equal probability
+    \item Latent positions: \code{Z[i,] ~ MVN(mu_g[i], I_k)} where \code{mu_g[i]} is the community center for node i's community
+    \item Community centers: \code{mu_g ~ Uniform sphere} of radius 3 in k-dimensional space
+    \item Edge probabilities: \code{P[i,j] = logit^{-1}(alpha[i] + alpha[j] - ||Z[i,] - Z[j,]||)}
+    \item Adjacency matrix: \code{A[i,j] ~ Bernoulli(P[i,j])} for i < j, with \code{A[i,i] = 0}
+  }
+  If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average degree.
 }
 \examples{
-# Generate a network with 100 nodes, 2D latent space, 3 communities
-result <- LSM.Gen(n = 100, k = 2, K = 3)
-# Generate with target average degree of 10
-result <- LSM.Gen(n = 100, k = 2, K = 3, avg.d = 10)
+# Generate a network with 500 nodes, 2D latent space, 3 communities
+result <- LSM.Gen(n = 500, k = 2, K = 3)
+# Generate with target average degree of 50
+result <- LSM.Gen(n = 500, k = 2, K = 3, avg.d = 50)
+}
+\references{
+P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
+  Journal of the American Statistical Association, 97(460):1090–1098, 2002.
+  
+  S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
+  arXiv preprint arXiv:2507.00402, 2025.
 }
