@@ -1,4 +1,4 @@
-# GRAND: G<span style="color:gray">raph</span> R<span style="color:gray">elease with</span> A<span style="color:gray">ssured</span> N<span style="color:gray">ode</span> D<span style="color:gray">ifferential Privacy</span>
+# GRAND: Graph Release with Assured Node Differential Privacy
 
 ## Overview
 
