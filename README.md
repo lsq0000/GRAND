@@ -35,7 +35,7 @@ The package requires the following R packages:
 library(GRAND)
 
 # Generate a sample network using Latent Space Model
-# Note: Use larger networks (n >= 1000) for better stability
+# Note: Use larger networks (n >= 500) for better stability
 network <- LSM.Gen(n = 1000, k = 3, K = 5)
 
 # Privatize the first 500 nodes with different privacy budgets
@@ -74,24 +74,22 @@ Generates a random network following the Latent Space Model (LSM) with specified
 - `Z`: Latent positions in k-dimensional space
 - `idx`: Community assignments for each node
 
-### `GRAND.privatize(A, K, idx, eps = 1, oracle.dt = NULL, model = "LSM", niter = 500, rho = 0.05)`
+### `GRAND.privatize(A, K, idx, eps = 1, model = "LSM", niter = 500, rho = 0.05)`
 Applies the GRAND (Graph Release with Assured Node Differential Privacy) method to privatize network data using differential privacy.
 
 - `A`: Matrix. Adjacency matrix of the input network.
 - `K`: Integer. Dimension of the latent space for network embedding.
 - `idx`: Integer vector. Indices of nodes to be privatized.
 - `eps`: Numeric or vector. Privacy budget parameter(s) for differential privacy. Default is 1.
-- `oracle.dt`: List. Optional oracle data containing true parameters for comparison. Default is NULL.
 - `model`: Character. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".
 - `niter`: Integer. Number of iterations for the optimization algorithm. Default is 500.
 - `rho`: Numeric. Parameter controlling the neighborhood size for conditional distributions. Default is 0.05.
 
 **Returns**: A list containing:
 - `non.private.result`: Results without privacy (original and estimated data)
-- `GRAND.result`: Results from GRAND privatization method
-- `Laplace.result`: Results from baseline Laplace mechanism
-- `eps`: Privacy parameters used
-- `oracle.result`: Oracle comparison results (if oracle.dt provided)
+- `GRAND.result`: List with one element per epsilon value. Each element contains privatization results for that specific epsilon
+- `Laplace.result`: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
+- `eps`: Vector of privacy parameters used
 
 ### `GRAND.evaluate(result, statistics = c("degree", "triangle", "vshape", "eigen", "harmonic"))`
 Evaluates the quality of GRAND privatization results by comparing various network statistics between the original and privatized networks using Wasserstein distance.
