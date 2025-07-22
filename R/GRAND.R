@@ -36,10 +36,23 @@ Add.Laplace <- function(X, eps = 1) {
 #'
 #' @title Generate Latent Space Model Network
 #' @description Generates a random network following the Latent Space Model (LSM) with specified parameters.
+#'   The LSM assumes that each node has a latent position in a k-dimensional space, and edge probabilities
+#'   depend on the distances between these latent positions.
 #' @param n Integer. Number of nodes in the network.
 #' @param k Integer. Dimension of the latent space.
 #' @param K Integer. Number of communities/groups.
 #' @param avg.d Numeric. Target average degree. If NULL, no degree adjustment is performed.
+#' @details 
+#'   The Latent Space Model generates networks based on the following process:
+#'   \enumerate{
+#'     \item Node-specific intercept parameters: \code{alpha[i] ~ Uniform(1, 3)}, then transformed as \code{alpha[i] = -alpha[i]/2}
+#'     \item Community assignments: Each node is randomly assigned to one of K communities with equal probability
+#'     \item Latent positions: \code{Z[i,] ~ MVN(mu_g[i], I_k)} where \code{mu_g[i]} is the community center for node i's community
+#'     \item Community centers: \code{mu_g ~ Uniform sphere} of radius 3 in k-dimensional space
+#'     \item Edge probabilities: \code{P[i,j] = logit^{-1}(alpha[i] + alpha[j] - ||Z[i,] - Z[j,]||)}
+#'     \item Adjacency matrix: \code{A[i,j] ~ Bernoulli(P[i,j])} for i < j, with \code{A[i,i] = 0}
+#'   }
+#'   If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average degree.
 #' @return A list containing:
 #' \itemize{
 #'   \item A: Adjacency matrix of the generated network
@@ -49,12 +62,18 @@ Add.Laplace <- function(X, eps = 1) {
 #'   \item Z: Latent positions in k-dimensional space
 #'   \item idx: Community assignments for each node
 #' }
+#' @references 
+#'   P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
+#'   Journal of the American Statistical Association, 97(460):1090–1098, 2002.
+#'   
+#'   S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
+#'   arXiv preprint arXiv:2507.00402, 2025.
 #' @export
 #' @examples
-#' # Generate a network with 100 nodes, 2D latent space, 3 communities
-#' result <- LSM.Gen(n = 100, k = 2, K = 3)
-#' # Generate with target average degree of 10
-#' result <- LSM.Gen(n = 100, k = 2, K = 3, avg.d = 10)
+#' # Generate a network with 500 nodes, 2D latent space, 3 communities
+#' result <- LSM.Gen(n = 500, k = 2, K = 3)
+#' # Generate with target average degree of 50
+#' result <- LSM.Gen(n = 500, k = 2, K = 3, avg.d = 50)
 LSM.Gen <- function(n, k, K, avg.d = NULL) {
   alpha <- runif(n, 1, 3)
   alpha <- -alpha / 2
@@ -187,25 +206,32 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
 #' @param K Integer. Dimension of the latent space for network embedding.
 #' @param idx Integer vector. Indices of nodes to be privatized.
 #' @param eps Numeric or vector. Privacy budget parameter(s) for differential privacy. Default is 1.
-#' @param oracle.dt List. Optional oracle data containing true parameters for comparison. Default is NULL.
 #' @param model Character. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".
 #' @param niter Integer. Number of iterations for the optimization algorithm. Default is 500.
 #' @param rho Numeric. Parameter controlling the neighborhood size for conditional distributions. Default is 0.05.
 #' @return A list containing:
 #' \itemize{
 #'   \item non.private.result: Results without privacy (original and estimated data)
-#'   \item GRAND.result: Results from GRAND privatization method
-#'   \item Laplace.result: Results from baseline Laplace mechanism
-#'   \item eps: Privacy parameters used
-#'   \item oracle.result: Oracle comparison results (if oracle.dt provided)
+#'   \item GRAND.result: List with one element per epsilon value. Each element contains privatization results for that specific epsilon
+#'   \item Laplace.result: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
+#'   \item eps: Vector of privacy parameters used
 #' }
+#' @references 
+#'   P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
+#'   Journal of the American Statistical Association, 97(460):1090–1098, 2002.
+#'   
+#'   S. J. Young and E. R. Scheinerman. Random dot product graph models for social networks. 
+#'   In International Workshop on Algorithms and Models for the Web-Graph, pages 138–149. Springer, 2007.
+#'   
+#'   S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
+#'   arXiv preprint arXiv:2507.00402, 2025.
 #' @export
 #' @examples
 #' # Generate a sample network
-#' dt <- LSM.Gen(n = 1000, k = 3, K = 5)
-#' # Privatize the first 500 nodes with epsilon = 1, 2, 5, 10
-#' result <- GRAND.privatize(A = dt$A, K = 3, idx = 1:500, eps = c(1, 2, 5, 10))
-GRAND.privatize <- function(A, K, idx, eps = 1, oracle.dt = NULL, model = c("LSM", "RDPG"), niter = 500, rho = 0.05) {
+#' dt <- LSM.Gen(n = 500, k = 3, K = 5)
+#' # Privatize the first 250 nodes with epsilon = 1, 2, 5, 10
+#' result <- GRAND.privatize(A = dt$A, K = 3, idx = 1:250, eps = c(1, 2, 5, 10))
+GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter = 500, rho = 0.05) {
   model <- match.arg(model)
 
   n <- nrow(A)
@@ -262,18 +288,6 @@ GRAND.privatize <- function(A, K, idx, eps = 1, oracle.dt = NULL, model = c("LSM
                              X1.hat = X1.hat, X2.hat = X2.hat)
   L <- length(eps)
   GRAND.result <- list()
-  oracle.result <- list()
-
-  if (!is.null(oracle.dt)) {
-    if (model == "LSM") {
-      oracle.X1 <- cbind(oracle.dt$alpha[idx], oracle.dt$Z[idx, , drop = FALSE])
-      oracle.X2 <- cbind(oracle.dt$alpha[holdout.idx], oracle.dt$Z[holdout.idx, , drop = FALSE])
-    } else {
-      ASE.oracle <- ase(oracle.dt$P, K)
-      oracle.X1 <- ASE.oracle[idx, , drop = FALSE]
-      oracle.X2 <- ASE.oracle[holdout.idx, , drop = FALSE]
-    }
-  }
 
   for (jj in 1:L) {
     cat(paste("Calling GRAND with \u03B5=", eps[jj], ".\n", sep = ""))
@@ -296,30 +310,6 @@ GRAND.privatize <- function(A, K, idx, eps = 1, oracle.dt = NULL, model = c("LSM
                                P1.grand = P1.dip,
                                g1.grand = g1.dip,
                                X1.grand = X1.dip)
-
-    if (!is.null(oracle.dt)) {
-      cat("Call the oracle version.\n")
-      cat(paste("Calling GRAND with \u03B5=", eps[jj], ".\n", sep = ""))
-      oracle.X1.dip <- DIP.multivariate(oracle.X1, eps[jj], oracle.X2, rho)
-      cat("Finish GRAND.\n")
-
-      if (model == "LSM") {
-        oracle.alpha1.dip <- oracle.X1.dip[, 1, drop = FALSE]
-        oracle.Z1.dip <- oracle.X1.dip[, -1, drop = FALSE]
-        oracle.theta1.dip <- oracle.alpha1.dip %*% t(rep(1, n1)) + rep(1, n1) %*% t(oracle.alpha1.dip) + oracle.Z1.dip %*% t(oracle.Z1.dip)
-        oracle.P1.dip <- 1 / (1 + exp(-oracle.theta1.dip))
-      } else {
-        oracle.Z1.dip <- oracle.X1.dip
-        oracle.theta1.dip <- oracle.Z1.dip %*% t(oracle.Z1.dip)
-        oracle.P1.dip <- pmin(pmax(oracle.theta1.dip, 1e-5), 1 - 1e-5)
-      }
-      oracle.A1.dip <- gen.A.from.P(oracle.P1.dip)
-      oracle.g1.dip <- graph.adjacency(oracle.A1.dip, "undirected")
-      oracle.result[[jj]] <- list(A1.oracle = oracle.A1.dip,
-                                  P1.oracle = oracle.P1.dip,
-                                  g1.oracle = oracle.g1.dip,
-                                  X1.oracle = oracle.X1.dip)
-    }
   }
 
   Laplace.result <- list()
@@ -346,7 +336,7 @@ GRAND.privatize <- function(A, K, idx, eps = 1, oracle.dt = NULL, model = c("LSM
                                  X1.Lap = X1.Lap)
   }
 
-  return(list(non.private.result = non.private.result, GRAND.result = GRAND.result, Laplace.result = Laplace.result, eps = eps, oracle.result = oracle.result))
+  return(list(non.private.result = non.private.result, GRAND.result = GRAND.result, Laplace.result = Laplace.result, eps = eps))
 }
 
 GRAND.evaluate.degree <- function(result) {
@@ -362,13 +352,6 @@ GRAND.evaluate.degree <- function(result) {
                            Hat2 = rep(wasserstein1d(degree.true2, degree.hat2), length(result$eps)),
                            GRAND = unlist(lapply(degree.grand, function(x) wasserstein1d(degree.true, x))),
                            Laplace = unlist(lapply(degree.lap, function(x) wasserstein1d(degree.true, x))))
-
-  if (length(result$oracle.result) > 0) {
-    degree.oracle <- lapply(result$oracle.result, function(x) log(1 + degree(x$g1.oracle)))
-    degree.mat$Oracle <- unlist(lapply(degree.oracle, function(x) wasserstein1d(degree.true, x)))
-  } else {
-    degree.mat$Oracle <- NA
-  }
 
   return(degree.mat)
 }
@@ -387,13 +370,6 @@ GRAND.evaluate.triangle <- function(result) {
                         GRAND = unlist(lapply(tri.grand, function(x) wasserstein1d(tri.true, x))),
                         Laplace = unlist(lapply(tri.lap, function(x) wasserstein1d(tri.true, x))))
 
-  if (length(result$oracle.result) > 0) {
-    tri.oracle <- lapply(result$oracle.result, function(x) log(1 + count_triangles(x$g1.oracle)))
-    tri.mat$Oracle <- unlist(lapply(tri.oracle, function(x) wasserstein1d(tri.true, x)))
-  } else {
-    tri.mat$Oracle <- NA
-  }
-
   return(tri.mat)
 }
 
@@ -411,12 +387,6 @@ GRAND.evaluate.vshape <- function(result) {
                        GRAND = unlist(lapply(vs.grand, function(x) wasserstein1d(vs.true, x))),
                        Laplace = unlist(lapply(vs.lap, function(x) wasserstein1d(vs.true, x))))
 
-  if (length(result$oracle.result) > 0) {
-    vs.oracle <- lapply(result$oracle.result, function(x) log(1 + get.v(x$g1.oracle)))
-    vs.mat$Oracle <- unlist(lapply(vs.oracle, function(x) wasserstein1d(vs.true, x)))
-  } else {
-    vs.mat$Oracle <- NA
-  }
 
   return(vs.mat)
 }
@@ -435,12 +405,6 @@ GRAND.evaluate.eigen <- function(result) {
                           GRAND = unlist(lapply(eigen.grand, function(x) wasserstein1d(eigen.true, x))),
                           Laplace = unlist(lapply(eigen.lap, function(x) wasserstein1d(eigen.true, x))))
 
-  if (length(result$oracle.result) > 0) {
-    eigen.oracle <- lapply(result$oracle.result, function(x) eigen_centrality(x$g1.oracle)$vector)
-    eigen.mat$Oracle <- unlist(lapply(eigen.oracle, function(x) wasserstein1d(eigen.true, x)))
-  } else {
-    eigen.mat$Oracle <- NA
-  }
 
   return(eigen.mat)
 }
@@ -459,12 +423,6 @@ GRAND.evaluate.harmonic <- function(result) {
                              GRAND = unlist(lapply(harmonic.grand, function(x) wasserstein1d(harmonic.true, x))),
                              Laplace = unlist(lapply(harmonic.lap, function(x) wasserstein1d(harmonic.true, x))))
 
-  if (length(result$oracle.result) > 0) {
-    harmonic.oracle <- lapply(result$oracle.result, function(x) harmonic_centrality(x$g1.oracle))
-    harmonic.mat$Oracle <- unlist(lapply(harmonic.oracle, function(x) wasserstein1d(harmonic.true, x)))
-  } else {
-    harmonic.mat$Oracle <- NA
-  }
 
   return(harmonic.mat)
 }
@@ -493,13 +451,15 @@ get.v <- function(g) {
 #'   \item Hat2: Wasserstein distance for holdout set estimation
 #'   \item GRAND: Wasserstein distance for GRAND privatization
 #'   \item Laplace: Wasserstein distance for Laplace mechanism
-#'   \item Oracle: Wasserstein distance for oracle method (if available)
 #' }
+#' @references 
+#'   S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
+#'   arXiv preprint arXiv:2507.00402, 2025.
 #' @export
 #' @examples
 #' # Generate and privatize a network
-#' dt <- LSM.Gen(n = 1000, k = 3, K = 5)
-#' result <- GRAND.privatize(A = dt$A, K = 3, idx = 1:500, eps = c(1, 2, 5, 10))
+#' dt <- LSM.Gen(n = 500, k = 3, K = 5)
+#' result <- GRAND.privatize(A = dt$A, K = 3, idx = 1:250, eps = c(1, 2, 5, 10))
 #' # Evaluate results for all statistics
 #' eval_results <- GRAND.evaluate(result)
 #' # Evaluate only degree and triangle statistics
