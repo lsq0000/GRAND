@@ -228,9 +228,9 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
 #' @export
 #' @examples
 #' # Generate a sample network
-#' dt <- LSM.Gen(n = 500, k = 3, K = 5)
+#' dt <- LSM.Gen(n = 500, k = 2, K = 3)
 #' # Privatize the first 250 nodes with epsilon = 1, 2, 5, 10
-#' result <- GRAND.privatize(A = dt$A, K = 3, idx = 1:250, eps = c(1, 2, 5, 10))
+#' result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
 GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter = 500, rho = 0.05) {
   model <- match.arg(model)
 
@@ -458,8 +458,8 @@ get.v <- function(g) {
 #' @export
 #' @examples
 #' # Generate and privatize a network
-#' dt <- LSM.Gen(n = 500, k = 3, K = 5)
-#' result <- GRAND.privatize(A = dt$A, K = 3, idx = 1:250, eps = c(1, 2, 5, 10))
+#' dt <- LSM.Gen(n = 500, k = 2, K = 3)
+#' result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
 #' # Evaluate results for all statistics
 #' eval_results <- GRAND.evaluate(result)
 #' # Evaluate only degree and triangle statistics

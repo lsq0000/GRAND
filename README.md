@@ -36,12 +36,12 @@ library(GRAND)
 
 # Generate a sample network using Latent Space Model
 # Note: Use larger networks (n >= 500) for better stability
-network <- LSM.Gen(n = 500, k = 3, K = 5)
+network <- LSM.Gen(n = 500, k = 2, K = 3)
 
 # Privatize the first 250 nodes with different privacy budgets
 result <- GRAND.privatize(
   A = network$A, 
-  K = 3, 
+  K = 2, 
   idx = 1:250, 
   eps = c(1, 2, 5, 10), 
   model = "LSM"
