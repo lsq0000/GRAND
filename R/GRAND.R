@@ -52,7 +52,7 @@ Add.Laplace <- function(X, eps = 1) {
 #'     \item Edge probabilities: \deqn{P_{ij} = \text{logit}^{-1}(\alpha_i + \alpha_j + Z_i^T Z_j) = \frac{1}{1 + \exp(-(\alpha_i + \alpha_j + Z_i^T Z_j))}}
 #'     \item Adjacency matrix: \eqn{A_{ij} \sim \text{Bernoulli}(P_{ij})} for \eqn{i < j}, with \eqn{A_{ii} = 0}
 #'   }
-#'   If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average degree.
+#'   If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average node degree.
 #' @return A list containing:
 #' \itemize{
 #'   \item A: Adjacency matrix of the generated network
@@ -157,10 +157,10 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
     }
 
     if (sum(colSums(abs(fit.holdout$Z)) < 1e-4) > 0) {
-      print(paste0("Potential deficiency of ", sum(colSums(abs(fit.holdout$Z)) < 1e-4), "."))
+      message(paste0("Potential deficiency of ", sum(colSums(abs(fit.holdout$Z)) < 1e-4), "."))
     }
 
-    print(paste0("PGD used ", length(fit.holdout$obj), " iterations."))
+    message(paste0("PGD used ", length(fit.holdout$obj), " iterations."))
 
     Z.holdout <- fit.holdout$Z
     alpha.holdout <- fit.holdout$alpha
@@ -293,9 +293,9 @@ GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter 
   GRAND.result <- list()
 
   for (jj in 1:L) {
-    cat(paste("Calling GRAND with \u03B5=", eps[jj], ".\n", sep = ""))
+    message(paste0("Calling GRAND with \u03B5=", eps[jj], ".\n"))
     X1.dip <- DIP.multivariate(X1.hat, eps[jj], X2.hat, rho)
-    cat("Finish GRAND.\n")
+    message("Finish GRAND.\n")
 
     if (model == "LSM") {
       alpha1.dip <- X1.dip[, 1, drop = FALSE]
@@ -317,9 +317,9 @@ GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter 
 
   Laplace.result <- list()
   for (jj in 1:L) {
-    cat(paste("Calling Laplace with \u03B5=", eps[jj], ".\n", sep = ""))
+    message(paste0("Calling Laplace with \u03B5=", eps[jj], ".\n"))
     X1.Lap <- Add.Laplace(X = X1.hat, eps = eps[jj])
-    cat("Finish Laplace.\n")
+    message("Finish Laplace.\n")
 
     if (model == "LSM") {
       alpha1.Lap <- X1.Lap[, 1, drop = FALSE]
