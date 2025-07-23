@@ -67,7 +67,7 @@ print(evaluation_subset)
 
 ## Main Functions
 
-### `LSM.Gen(n, k, K, avg.d = NULL)`
+### 1️⃣ `LSM.Gen(n, k, K, avg.d = NULL)`
 Generates a random network following LSM (Latent Space Model) with specified parameters.
 
 - `n`: Integer. Number of nodes in the network.
@@ -83,7 +83,7 @@ Generates a random network following LSM (Latent Space Model) with specified par
 - `Z`: Latent positions in k-dimensional space
 - `idx`: Community assignments for each node
 
-### `GRAND.privatize(A, K, idx, eps = 1, model = "LSM", niter = 500, rho = 0.05)`
+### 2️⃣ `GRAND.privatize(A, K, idx, eps = 1, model = "LSM", niter = 500, rho = 0.05)`
 Applies the GRAND (Graph Release with Assured Node Differential Privacy) method to privatize network data using differential privacy.
 
 - `A`: Matrix. Adjacency matrix of the input network.
@@ -100,7 +100,7 @@ Applies the GRAND (Graph Release with Assured Node Differential Privacy) method 
 - `Laplace.result`: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
 - `eps`: Vector of privacy parameters used
 
-### `GRAND.evaluate(result, statistics = c("degree", "triangle", "vshape", "eigen", "harmonic"))`
+### 3️⃣ `GRAND.evaluate(result, statistics = c("degree", "triangle", "vshape", "eigen", "harmonic"))`
 Evaluates the quality of GRAND privatization results by comparing various network statistics between the original and privatized networks using Wasserstein distance.
 
 - `result`: List. Output from GRAND.privatize function containing privatization results.
