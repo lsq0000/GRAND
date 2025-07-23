@@ -50,15 +50,4 @@ In International Workshop on Algorithms and Models for the Web-Graph, pages 138â
 S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
 arXiv preprint arXiv:2507.00402, 2025.
 }
-\examples{
-# Generate a sample network
-dt <- LSM.Gen(n = 500, k = 2, K = 3)
-
-# Privatize the first 250 nodes with multiple epsilon values
-result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
-
-# Evaluate the privatization results
-evaluation <- GRAND.evaluate(dt, result)
-print(evaluation)
-}
 \keyword{package}
