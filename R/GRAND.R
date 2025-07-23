@@ -35,22 +35,22 @@ Add.Laplace <- function(X, eps = 1) {
 #' Generate Latent Space Model Network
 #'
 #' @title Generate Latent Space Model Network
-#' @description Generates a random network following the Latent Space Model (LSM) with specified parameters.
-#'   The LSM assumes that each node has a latent position in a k-dimensional space, and edge probabilities
-#'   depend on the distances between these latent positions.
+#' @description Generates a random network following LSM (Latent Space Model) with specified parameters.
+#'   LSM assumes that each node has a latent position in a k-dimensional space, and edge probabilities
+#'   depend on the inner products between these latent positions.
 #' @param n Integer. Number of nodes in the network.
 #' @param k Integer. Dimension of the latent space.
 #' @param K Integer. Number of communities/groups.
-#' @param avg.d Numeric. Target average degree. If NULL, no degree adjustment is performed.
+#' @param avg.d Numeric. Target average node degree. If NULL, no degree adjustment is performed. Default is "NULL".
 #' @details 
 #'   The Latent Space Model generates networks based on the following process:
 #'   \enumerate{
-#'     \item Node-specific intercept parameters: \code{alpha[i] ~ Uniform(1, 3)}, then transformed as \code{alpha[i] = -alpha[i]/2}
+#'     \item Node-specific intercept parameters: \eqn{\alpha_i \sim \text{Unif}(1, 3)}, then transformed as \eqn{\alpha_i = -\alpha_i/2}
 #'     \item Community assignments: Each node is randomly assigned to one of K communities with equal probability
-#'     \item Latent positions: \code{Z[i,] ~ MVN(mu_g[i], I_k)} where \code{mu_g[i]} is the community center for node i's community
-#'     \item Community centers: \code{mu_g ~ Uniform sphere} of radius 3 in k-dimensional space
-#'     \item Edge probabilities: \code{P[i,j] = logit^{-1}(alpha[i] + alpha[j] - ||Z[i,] - Z[j,]||)}
-#'     \item Adjacency matrix: \code{A[i,j] ~ Bernoulli(P[i,j])} for i < j, with \code{A[i,i] = 0}
+#'     \item Latent positions: \eqn{Z_i \sim \text{MVN}(\mu_{g_i}, I_k)} where \eqn{\mu_{g_i}} is the community center for node i's community
+#'     \item Community centers: \eqn{\mu_g} sampled uniformly on a sphere of radius 3 in k-dimensional space
+#'     \item Edge probabilities: \deqn{P_{ij} = \text{logit}^{-1}(\alpha_i + \alpha_j + Z_i^T Z_j) = \frac{1}{1 + \exp(-(\alpha_i + \alpha_j + Z_i^T Z_j))}}
+#'     \item Adjacency matrix: \eqn{A_{ij} \sim \text{Bernoulli}(P_{ij})} for \eqn{i < j}, with \eqn{A_{ii} = 0}
 #'   }
 #'   If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average degree.
 #' @return A list containing:
@@ -65,6 +65,9 @@ Add.Laplace <- function(X, eps = 1) {
 #' @references 
 #'   P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
 #'   Journal of the American Statistical Association, 97(460):1090–1098, 2002.
+#'   
+#'   Z. Ma, Z. Ma, and H. Yuan. Universal latent space model fitting for large networks with edge covariates.
+#'   Journal of Machine Learning Research, 21(4):1–67, 2020.
 #'   
 #'   S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
 #'   arXiv preprint arXiv:2507.00402, 2025.
