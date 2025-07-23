@@ -68,7 +68,7 @@ print(evaluation_subset)
 ## Main Functions
 
 ### `LSM.Gen(n, k, K, avg.d = NULL)`
-Generates a random network following the Latent Space Model (LSM) with specified parameters.
+Generates a random network following LSM (Latent Space Model) with specified parameters.
 
 - `n`: Integer. Number of nodes in the network.
 - `k`: Integer. Dimension of the latent space.
@@ -116,7 +116,7 @@ Evaluates the quality of GRAND privatization results by comparing various networ
 
 ## Features
 
-- **Network Generation**: Generate synthetic networks using Latent Space Models
+- **Network Generation**: Generate synthetic networks using Latent Space Model
 - **Differential Privacy**: Apply node-level differential privacy to network data
 - **Multiple Models**: Support for both LSM and RDPG models
 - **Comprehensive Evaluation**: Evaluate utility through multiple network statistics
