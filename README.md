@@ -9,7 +9,7 @@ GRAND (Graph Release with Assured Node Differential Privacy) is an R package tha
 ### From CRAN (Stable Version)
 
 ```r
-# Install from CRAN
+# Install GRAND from CRAN
 install.packages("GRAND")
 ```
 
@@ -113,7 +113,6 @@ Evaluates the quality of GRAND privatization results by comparing various networ
 - `Hat2`: Wasserstein distance for holdout set estimation
 - `GRAND`: Wasserstein distance for GRAND privatization
 - `Laplace`: Wasserstein distance for Laplace mechanism
-- `Oracle`: Wasserstein distance for oracle method (if available)
 
 ## Features
 
@@ -127,7 +126,7 @@ Evaluates the quality of GRAND privatization results by comparing various networ
 
 GRAND uses a two-step approach:
 1. **Latent Position Estimation**: Estimates latent positions from the network structure
-2. **Multivariate Differential Privacy**: Applies DIP (Differential Privacy) mechanism to protect latent positions while preserving network utility
+2. **Multivariate Differential Privacy**: Applies DIP (Distribution-Invariant differential Privacy) mechanism to protect latent positions while preserving network utility
 
 ## License
 
