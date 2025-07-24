@@ -320,7 +320,6 @@ GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter 
   for (jj in 1:L) {
     cat(paste0("Calling GRAND with \u03B5=", eps[jj], ".\n"))
     X1.dip <- DIP.multivariate(X1.hat, eps[jj], X2.hat, rho)
-    cat("Finish GRAND.\n")
 
     if (model == "LSM") {
       alpha1.dip <- X1.dip[, 1, drop = FALSE]
@@ -339,12 +338,12 @@ GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter 
                                g1.grand = g1.dip,
                                X1.grand = X1.dip)
   }
+  cat("Finish GRAND.\n")
 
   Laplace.result <- list()
   for (jj in 1:L) {
     cat(paste0("Calling Laplace with \u03B5=", eps[jj], ".\n"))
     X1.Lap <- Add.Laplace(X = X1.hat, eps = eps[jj])
-    cat("Finish Laplace.\n")
 
     if (model == "LSM") {
       alpha1.Lap <- X1.Lap[, 1, drop = FALSE]
@@ -363,6 +362,7 @@ GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter 
                                  g1.Lap = g1.Lap,
                                  X1.Lap = X1.Lap)
   }
+  cat("Finish Laplace.\n")
 
   return(list(non.private.result = non.private.result, GRAND.result = GRAND.result, Laplace.result = Laplace.result, eps = eps))
 }
