@@ -38,7 +38,7 @@ The package is designed for researchers and practitioners working with sensitive
 \author{
 \packageAuthor{GRAND}
 
-Maintainer: \packageMaintainer{GRAND}
+Maintainer: Suqing Liu <\email{liusuqing0123@uchicago.edu}>
 }
 \references{
 P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
