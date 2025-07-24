@@ -1,5 +1,6 @@
 \name{GRAND-package}
 \alias{GRAND-package}
+\alias{GRAND}
 \alias{_PACKAGE}
 \docType{package}
 \title{

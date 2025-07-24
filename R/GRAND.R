@@ -159,10 +159,10 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
     }
 
     if (sum(colSums(abs(fit.holdout$Z)) < 1e-4) > 0) {
-      message(paste0("Potential deficiency of ", sum(colSums(abs(fit.holdout$Z)) < 1e-4), "."))
+      stop(paste0("Potential deficiency of ", sum(colSums(abs(fit.holdout$Z)) < 1e-4), "."))
     }
 
-    message(paste0("PGD used ", length(fit.holdout$obj), " iterations."))
+    cat("PGD used", length(fit.holdout$obj), "iterations.\n")
 
     Z.holdout <- fit.holdout$Z
     alpha.holdout <- fit.holdout$alpha
@@ -318,9 +318,9 @@ GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter 
   GRAND.result <- list()
 
   for (jj in 1:L) {
-    message(paste0("Calling GRAND with \u03B5=", eps[jj], ".\n"))
+    cat(paste0("Calling GRAND with \u03B5=", eps[jj], ".\n"))
     X1.dip <- DIP.multivariate(X1.hat, eps[jj], X2.hat, rho)
-    message("Finish GRAND.\n")
+    cat("Finish GRAND.\n")
 
     if (model == "LSM") {
       alpha1.dip <- X1.dip[, 1, drop = FALSE]
@@ -342,9 +342,9 @@ GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter 
 
   Laplace.result <- list()
   for (jj in 1:L) {
-    message(paste0("Calling Laplace with \u03B5=", eps[jj], ".\n"))
+    cat(paste0("Calling Laplace with \u03B5=", eps[jj], ".\n"))
     X1.Lap <- Add.Laplace(X = X1.hat, eps = eps[jj])
-    message("Finish Laplace.\n")
+    cat("Finish Laplace.\n")
 
     if (model == "LSM") {
       alpha1.Lap <- X1.Lap[, 1, drop = FALSE]
