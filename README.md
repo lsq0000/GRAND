@@ -70,10 +70,10 @@ print(evaluation_subset)
 ### 1️⃣ `LSM.Gen(n, k, K, avg.d = NULL)`
 Generates a random network following LSM (Latent Space Model) with specified parameters.
 
-- `n`: Integer. Number of nodes in the network.
-- `k`: Integer. Dimension of the latent space.
-- `K`: Integer. Number of communities/groups.
-- `avg.d`: Numeric. Target average node degree. If NULL, no degree adjustment is performed.
+- `n`: *Integer*. Number of nodes in the network.
+- `k`: *Integer*. Dimension of the latent space.
+- `K`: *Integer*. Number of communities/groups.
+- `avg.d`: *Numeric*. Target average node degree. If NULL, no degree adjustment is performed.
 
 **Returns**: A list containing:
 - `A`: Adjacency matrix of the generated network
@@ -86,13 +86,13 @@ Generates a random network following LSM (Latent Space Model) with specified par
 ### 2️⃣ `GRAND.privatize(A, K, idx, eps = 1, model = "LSM", niter = 500, rho = 0.05)`
 Applies the GRAND (Graph Release with Assured Node Differential privacy) method to privatize network data using differential privacy.
 
-- `A`: Matrix. Adjacency matrix of the input network.
-- `K`: Integer. Dimension of the latent space for network embedding.
-- `idx`: Integer vector. Indices of nodes to be privatized.
-- `eps`: Numeric or numeric vector. Privacy budget parameter(s) for differential privacy. Default is 1.
-- `model`: Character. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".
-- `niter`: Integer. Number of iterations for the optimization algorithm. Default is 500.
-- `rho`: Numeric. Parameter controlling the neighborhood size for conditional distributions. Default is 0.05.
+- `A`: *Matrix*. Adjacency matrix of the input network.
+- `K`: *Integer*. Dimension of the latent space for network embedding.
+- `idx`: *Integer vector*. Indices of nodes to be privatized.
+- `eps`: *Numeric or numeric vector*. Privacy budget parameter(s) for differential privacy. Default is 1.
+- `model`: *Character*. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".
+- `niter`: *Integer*. Number of iterations for the optimization algorithm. Default is 500.
+- `rho`: *Numeric*. Parameter controlling the neighborhood size for conditional distributions. Default is 0.05.
 
 **Returns**: A list containing:
 - `non.private.result`: Results without privacy (original and estimated data)
@@ -103,16 +103,16 @@ Applies the GRAND (Graph Release with Assured Node Differential privacy) method 
 ### 3️⃣ `GRAND.evaluate(result, statistics = c("degree", "vshape", "triangle", "eigen", "harmonic"))`
 Evaluates the quality of GRAND privatization results by comparing various network statistics between the original and privatized networks using Wasserstein distance.
 
-- `result`: List. Output from GRAND.privatize function containing privatization results.
-- `statistics`: Character vector. Network statistics to evaluate. Options include: "degree", "vshape", "triangle", "eigen", "harmonic". Default is all statistics.
+- `result`: *List*. Output from GRAND.privatize function containing privatization results.
+- `statistics`: *Character vector*. Network statistics to evaluate. Options include: "degree" (Node Degree), "vshape" (V-Shape Count), "triangle" (Triangle Count), "eigen" (Eigen Centrality), "harmonic" (Harmonic Centrality). Default is all statistics.
 
 **Returns**: A data frame containing evaluation results with columns:
-- `stat`: Type of network statistic evaluated
-- `eps`: Privacy parameter used
-- `Hat`: Wasserstein distance for non-private estimation
+- `stat`: Type of network statistic(s) evaluated
+- `eps`: Privacy budget parameter(s) used
+- `Hat`: Wasserstein distance for release set estimation
 - `Hat2`: Wasserstein distance for holdout set estimation
-- `GRAND`: Wasserstein distance for GRAND privatization
-- `Laplace`: Wasserstein distance for Laplace mechanism
+- `GRAND`: Wasserstein distance for GRAND privatization method
+- `Laplace`: Wasserstein distance for standard Laplace mechanism
 
 ## Features
 

@@ -39,7 +39,7 @@ A list containing:
 }
 }
 \description{
-Applies the GRAND (Graph Release with Assured Node Differential Privacy) method
+Applies the GRAND (Graph Release with Assured Node Differential privacy) method
 to privatize network data using differential privacy. The method estimates latent positions
 from the network and applies multivariate differential privacy to protect sensitive information.
 }
