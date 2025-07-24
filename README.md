@@ -84,12 +84,12 @@ Generates a random network following LSM (Latent Space Model) with specified par
 - `idx`: Community assignments for each node
 
 ### 2️⃣ `GRAND.privatize(A, K, idx, eps = 1, model = "LSM", niter = 500, rho = 0.05)`
-Applies the GRAND (Graph Release with Assured Node Differential Privacy) method to privatize network data using differential privacy.
+Applies the GRAND (Graph Release with Assured Node Differential privacy) method to privatize network data using differential privacy.
 
 - `A`: Matrix. Adjacency matrix of the input network.
 - `K`: Integer. Dimension of the latent space for network embedding.
 - `idx`: Integer vector. Indices of nodes to be privatized.
-- `eps`: Numeric or vector. Privacy budget parameter(s) for differential privacy. Default is 1.
+- `eps`: Numeric or numeric vector. Privacy budget parameter(s) for differential privacy. Default is 1.
 - `model`: Character. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".
 - `niter`: Integer. Number of iterations for the optimization algorithm. Default is 500.
 - `rho`: Numeric. Parameter controlling the neighborhood size for conditional distributions. Default is 0.05.
@@ -98,7 +98,7 @@ Applies the GRAND (Graph Release with Assured Node Differential Privacy) method 
 - `non.private.result`: Results without privacy (original and estimated data)
 - `GRAND.result`: List with one element per epsilon value. Each element contains privatization results for that specific epsilon
 - `Laplace.result`: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
-- `eps`: Vector of privacy parameters used
+- `eps`: Vector of privacy budget parameter(s) used
 
 ### 3️⃣ `GRAND.evaluate(result, statistics = c("degree", "vshape", "triangle", "eigen", "harmonic"))`
 Evaluates the quality of GRAND privatization results by comparing various network statistics between the original and privatized networks using Wasserstein distance.

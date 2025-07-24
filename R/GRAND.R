@@ -204,7 +204,7 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
 #' GRAND Privatization of Network Data
 #'
 #' @title GRAND Privatization of Network Data
-#' @description Applies the GRAND (Graph Release with Assured Node Differential Privacy) method
+#' @description Applies the GRAND (Graph Release with Assured Node Differential privacy) method
 #' to privatize network data using differential privacy. The method estimates latent positions
 #' from the network and applies multivariate differential privacy to protect sensitive information.
 #' @param A Matrix. Adjacency matrix of the input network.
