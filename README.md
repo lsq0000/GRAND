@@ -73,7 +73,7 @@ Generates a random network following LSM (Latent Space Model) with specified par
 - `n`: Integer. Number of nodes in the network.
 - `k`: Integer. Dimension of the latent space.
 - `K`: Integer. Number of communities/groups.
-- `avg.d`: Numeric. Target average degree. If NULL, no degree adjustment is performed.
+- `avg.d`: Numeric. Target average node degree. If NULL, no degree adjustment is performed.
 
 **Returns**: A list containing:
 - `A`: Adjacency matrix of the generated network
@@ -100,14 +100,14 @@ Applies the GRAND (Graph Release with Assured Node Differential Privacy) method 
 - `Laplace.result`: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
 - `eps`: Vector of privacy parameters used
 
-### 3️⃣ `GRAND.evaluate(result, statistics = c("degree", "triangle", "vshape", "eigen", "harmonic"))`
+### 3️⃣ `GRAND.evaluate(result, statistics = c("degree", "vshape", "triangle", "eigen", "harmonic"))`
 Evaluates the quality of GRAND privatization results by comparing various network statistics between the original and privatized networks using Wasserstein distance.
 
 - `result`: List. Output from GRAND.privatize function containing privatization results.
-- `statistics`: Character vector. Network statistics to evaluate. Options include: "degree", "triangle", "vshape", "eigen", "harmonic". Default is all statistics.
+- `statistics`: Character vector. Network statistics to evaluate. Options include: "degree", "vshape", "triangle", "eigen", "harmonic". Default is all statistics.
 
 **Returns**: A data frame containing evaluation results with columns:
-- `metric`: Type of network statistic evaluated
+- `stat`: Type of network statistic evaluated
 - `eps`: Privacy parameter used
 - `Hat`: Wasserstein distance for non-private estimation
 - `Hat2`: Wasserstein distance for holdout set estimation
@@ -125,7 +125,7 @@ Evaluates the quality of GRAND privatization results by comparing various networ
 ## Methodology
 
 GRAND uses a two-step approach:
-1. **Latent Position Estimation**: Estimates latent positions from the network structure
+1. **Latent Position Estimation**: Estimates latent positions from the network structure using either LSM.PGD (Projected Gradient Descent, for LSM) or ASE (Adjacency Spectral Embedding, for RDPG)
 2. **Multivariate Differential Privacy**: Applies DIP (Distribution-Invariant differential Privacy) mechanism to protect latent positions while preserving network utility
 
 ## License

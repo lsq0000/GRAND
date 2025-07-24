@@ -21,7 +21,7 @@ GRAND.privatize(
 
 \item{idx}{Integer vector. Indices of nodes to be privatized.}
 
-\item{eps}{Numeric or vector. Privacy budget parameter(s) for differential privacy. Default is 1.}
+\item{eps}{Numeric or numeric vector. Privacy budget parameter(s) for differential privacy. Default is 1.}
 
 \item{model}{Character. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".}
 
@@ -32,10 +32,10 @@ GRAND.privatize(
 \value{
 A list containing:
 \itemize{
-  \item non.private.result: Results without privacy (original and estimated data)
-  \item GRAND.result: List with one element per epsilon value. Each element contains privatization results for that specific epsilon
+  \item non.private.result: Results without privacy, including the original and estimated data
+  \item GRAND.result: List with one element per epsilon value. Each element contains GRAND privatization results for that specific epsilon
   \item Laplace.result: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
-  \item eps: Vector of privacy parameters used
+  \item eps: Vector of privacy budget parameter(s) used
 }
 }
 \description{
@@ -44,13 +44,25 @@ to privatize network data using differential privacy. The method estimates laten
 from the network and applies multivariate differential privacy to protect sensitive information.
 }
 \details{
-GRAND: Graph Release with Assured Node Differential Privacy
+GRAND Privatization of Network Data
+
+
+  The GRAND privatization algorithm consists of the following steps:
+  \enumerate{
+    \item \strong{Network partitioning}: Split nodes into release set (idx) and holdout set
+    \item \strong{Latent position estimation}: Use LSM.PGD (Projected Gradient Descent) or ASE (Adjacency Spectral Embedding) to estimate latent positions
+    \item \strong{Differential privacy}: Apply multivariate DIP (Distribution-Invariant differential Privacy) mechanism to protect latent positions
+    \item \strong{Network reconstruction}: Generate privatized networks from perturbed latent positions
+  }
+  The method also computes standard Laplace mechanism results for comparison.
+
+  For more details, see the "proposed method" section of Liu, Bi, and Li (2025).
 }
 \examples{
 # Generate a sample network
-dt <- LSM.Gen(n = 500, k = 2, K = 3)
+network <- LSM.Gen(n = 500, k = 2, K = 3)
 # Privatize the first 250 nodes with epsilon = 1, 2, 5, 10
-result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
+result <- GRAND.privatize(A = network$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10), model = "LSM")
 }
 \references{
 P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
@@ -59,6 +71,18 @@ P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social
   S. J. Young and E. R. Scheinerman. Random dot product graph models for social networks. 
   In International Workshop on Algorithms and Models for the Web-Graph, pages 138–149. Springer, 2007.
   
+  Z. Ma, Z. Ma, and H. Yuan. Universal latent space model fitting for large networks with edge covariates. 
+  Journal of Machine Learning Research, 21(4):1–67, 2020.
+
+  A. Athreya, D. E. Fishkind, M. Tang, C. E. Priebe, Y. Park, J. T. Vogelstein, K. Levin, V. Lyzinski, Y. Qin, and D. L. Sussman. Statistical inference on random dot product graphs: a survey. 
+  Journal of Machine Learning Research, 18(226):1–92, 2018.
+
+  P. Rubin-Delanchy, J. Cape, M. Tang, and C. E. Priebe. A statistical interpretation of spectral embedding: The generalised random dot product graph. 
+  Journal of the Royal Statistical Society Series B: Statistical Methodology, 84(4):1446–1473, 2022.
+
+  X. Bi and X. Shen. Distribution-invariant differential privacy. 
+  Journal of Econometrics, 235(2):444–453, 2023.
+
   S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
   arXiv preprint arXiv:2507.00402, 2025.
 }

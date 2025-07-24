@@ -45,14 +45,16 @@ Add.Laplace <- function(X, eps = 1) {
 #' @details 
 #'   The Latent Space Model generates networks based on the following process:
 #'   \enumerate{
-#'     \item Node-specific intercept parameters: \eqn{\alpha_i \sim \text{Unif}(1, 3)}, then transformed as \eqn{\alpha_i = -\alpha_i/2}
+#'     \item Node-specific intercept parameters: \eqn{\alpha_i \sim \mathsf{Unif}(1, 3)}, then transformed as \eqn{\alpha_i = -\alpha_i/2}
 #'     \item Community assignments: Each node is randomly assigned to one of K communities with equal probability
-#'     \item Latent positions: \eqn{Z_i \sim \text{MVN}(\mu_{g_i}, I_k)} where \eqn{\mu_{g_i}} is the community center for node i's community
-#'     \item Community centers: \eqn{\mu_g} sampled uniformly on a sphere of radius 3 in k-dimensional space
-#'     \item Edge probabilities: \deqn{P_{ij} = \text{logit}^{-1}(\alpha_i + \alpha_j + Z_i^T Z_j) = \frac{1}{1 + \exp(-(\alpha_i + \alpha_j + Z_i^T Z_j))}}
-#'     \item Adjacency matrix: \eqn{A_{ij} \sim \text{Bernoulli}(P_{ij})} for \eqn{i < j}, with \eqn{A_{ii} = 0}
+#'     \item Community centers: \eqn{\mu_g} sampled uniformly from \eqn{[-1, 1]^k} hypercube
+#'     \item Latent positions: \eqn{Z_i \sim \mathcal{N}_{[-2, 2]}(\mu_{g_i}, I_k)} where \eqn{\mu_{g_i}} is the community center for node i's community
+#'     \item Edge probabilities: \deqn{P_{ij} = \text{logit}^{-1}(\alpha_i + \alpha_j + Z_i^\top Z_j) = \frac{1}{1 + \exp(-(\alpha_i + \alpha_j + Z_i^\top Z_j))}}
+#'     \item Adjacency matrix: \eqn{A_{ij} \sim \mathsf{Bern}(P_{ij})} for \eqn{i < j}, with \eqn{A_{ii} = 0} and \eqn{A_{ji} = A_{ij}}
 #'   }
 #'   If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average node degree.
+#'   
+#'   For more details, see the "simulation studies" section of Ma, Ma, and Yuan (2020), noting that our implementation has slight differences.
 #' @return A list containing:
 #' \itemize{
 #'   \item A: Adjacency matrix of the generated network
@@ -74,9 +76,9 @@ Add.Laplace <- function(X, eps = 1) {
 #' @export
 #' @examples
 #' # Generate a network with 500 nodes, 2D latent space, 3 communities
-#' result <- LSM.Gen(n = 500, k = 2, K = 3)
+#' network <- LSM.Gen(n = 500, k = 2, K = 3)
 #' # Generate with target average degree of 50
-#' result <- LSM.Gen(n = 500, k = 2, K = 3, avg.d = 50)
+#' network2 <- LSM.Gen(n = 500, k = 2, K = 3, avg.d = 50)
 LSM.Gen <- function(n, k, K, avg.d = NULL) {
   alpha <- runif(n, 1, 3)
   alpha <- -alpha / 2
@@ -199,7 +201,7 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
   }
 }
 
-#' GRAND: Graph Release with Assured Node Differential Privacy
+#' GRAND Privatization of Network Data
 #'
 #' @title GRAND Privatization of Network Data
 #' @description Applies the GRAND (Graph Release with Assured Node Differential Privacy) method
@@ -208,16 +210,27 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
 #' @param A Matrix. Adjacency matrix of the input network.
 #' @param K Integer. Dimension of the latent space for network embedding.
 #' @param idx Integer vector. Indices of nodes to be privatized.
-#' @param eps Numeric or vector. Privacy budget parameter(s) for differential privacy. Default is 1.
+#' @param eps Numeric or numeric vector. Privacy budget parameter(s) for differential privacy. Default is 1.
 #' @param model Character. Model type, either "LSM" (Latent Space Model) or "RDPG" (Random Dot Product Graph). Default is "LSM".
 #' @param niter Integer. Number of iterations for the optimization algorithm. Default is 500.
 #' @param rho Numeric. Parameter controlling the neighborhood size for conditional distributions. Default is 0.05.
+#' @details 
+#'   The GRAND privatization algorithm consists of the following steps:
+#'   \enumerate{
+#'     \item \strong{Network partitioning}: Split nodes into release set (idx) and holdout set
+#'     \item \strong{Latent position estimation}: Use LSM.PGD (Projected Gradient Descent) or ASE (Adjacency Spectral Embedding) to estimate latent positions
+#'     \item \strong{Differential privacy}: Apply multivariate DIP (Distribution-Invariant differential Privacy) mechanism to protect latent positions
+#'     \item \strong{Network reconstruction}: Generate privatized networks from perturbed latent positions
+#'   }
+#'   The method also computes standard Laplace mechanism results for comparison.
+#'
+#'   For more details, see the "proposed method" section of Liu, Bi, and Li (2025).
 #' @return A list containing:
 #' \itemize{
-#'   \item non.private.result: Results without privacy (original and estimated data)
-#'   \item GRAND.result: List with one element per epsilon value. Each element contains privatization results for that specific epsilon
+#'   \item non.private.result: Results without privacy, including the original and estimated data
+#'   \item GRAND.result: List with one element per epsilon value. Each element contains GRAND privatization results for that specific epsilon
 #'   \item Laplace.result: List with one element per epsilon value. Each element contains baseline Laplace mechanism results for that specific epsilon
-#'   \item eps: Vector of privacy parameters used
+#'   \item eps: Vector of privacy budget parameter(s) used
 #' }
 #' @references 
 #'   P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
@@ -226,14 +239,26 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
 #'   S. J. Young and E. R. Scheinerman. Random dot product graph models for social networks. 
 #'   In International Workshop on Algorithms and Models for the Web-Graph, pages 138–149. Springer, 2007.
 #'   
+#'   Z. Ma, Z. Ma, and H. Yuan. Universal latent space model fitting for large networks with edge covariates. 
+#'   Journal of Machine Learning Research, 21(4):1–67, 2020.
+#'
+#'   A. Athreya, D. E. Fishkind, M. Tang, C. E. Priebe, Y. Park, J. T. Vogelstein, K. Levin, V. Lyzinski, Y. Qin, and D. L. Sussman. Statistical inference on random dot product graphs: a survey. 
+#'   Journal of Machine Learning Research, 18(226):1–92, 2018.
+#'
+#'   P. Rubin-Delanchy, J. Cape, M. Tang, and C. E. Priebe. A statistical interpretation of spectral embedding: The generalised random dot product graph. 
+#'   Journal of the Royal Statistical Society Series B: Statistical Methodology, 84(4):1446–1473, 2022.
+#'
+#'   X. Bi and X. Shen. Distribution-invariant differential privacy. 
+#'   Journal of Econometrics, 235(2):444–453, 2023.
+#'
 #'   S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
 #'   arXiv preprint arXiv:2507.00402, 2025.
 #' @export
 #' @examples
 #' # Generate a sample network
-#' dt <- LSM.Gen(n = 500, k = 2, K = 3)
+#' network <- LSM.Gen(n = 500, k = 2, K = 3)
 #' # Privatize the first 250 nodes with epsilon = 1, 2, 5, 10
-#' result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
+#' result <- GRAND.privatize(A = network$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10), model = "LSM")
 GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter = 500, rho = 0.05) {
   model <- match.arg(model)
 
@@ -349,7 +374,7 @@ GRAND.evaluate.degree <- function(result) {
   degree.hat2 <- log(1 + degree(result$non.private.result$g2.hat))
   degree.grand <- lapply(result$GRAND.result, function(x) log(1 + degree(x$g1.grand)))
   degree.lap <- lapply(result$Laplace.result, function(x) log(1 + degree(x$g1.Lap)))
-  degree.mat <- data.frame(metric = rep("Node Degree", length(result$eps)),
+  degree.mat <- data.frame(stat = rep("Node Degree", length(result$eps)),
                            eps = result$eps,
                            Hat = rep(wasserstein1d(degree.true, degree.hat), length(result$eps)),
                            Hat2 = rep(wasserstein1d(degree.true2, degree.hat2), length(result$eps)),
@@ -359,23 +384,6 @@ GRAND.evaluate.degree <- function(result) {
   return(degree.mat)
 }
 
-GRAND.evaluate.triangle <- function(result) {
-  tri.true <- log(1 + count_triangles(result$non.private.result$g1))
-  tri.hat <- log(1 + count_triangles(result$non.private.result$g1.hat))
-  tri.true2 <- log(1 + count_triangles(result$non.private.result$g2))
-  tri.hat2 <- log(1 + count_triangles(result$non.private.result$g2.hat))
-  tri.grand <- lapply(result$GRAND.result, function(x) log(1 + count_triangles(x$g1.grand)))
-  tri.lap <- lapply(result$Laplace.result, function(x) log(1 + count_triangles(x$g1.Lap)))
-  tri.mat <- data.frame(metric = rep("Triangle Count", length(result$eps)),
-                        eps = result$eps,
-                        Hat = rep(wasserstein1d(tri.true, tri.hat), length(result$eps)),
-                        Hat2 = rep(wasserstein1d(tri.true2, tri.hat2), length(result$eps)),
-                        GRAND = unlist(lapply(tri.grand, function(x) wasserstein1d(tri.true, x))),
-                        Laplace = unlist(lapply(tri.lap, function(x) wasserstein1d(tri.true, x))))
-
-  return(tri.mat)
-}
-
 GRAND.evaluate.vshape <- function(result) {
   vs.true <- log(1 + get.v(result$non.private.result$g1))
   vs.hat <- log(1 + get.v(result$non.private.result$g1.hat))
@@ -383,7 +391,7 @@ GRAND.evaluate.vshape <- function(result) {
   vs.hat2 <- log(1 + get.v(result$non.private.result$g2.hat))
   vs.grand <- lapply(result$GRAND.result, function(x) log(1 + get.v(x$g1.grand)))
   vs.lap <- lapply(result$Laplace.result, function(x) log(1 + get.v(x$g1.Lap)))
-  vs.mat <- data.frame(metric = rep("V-Shape Count", length(result$eps)),
+  vs.mat <- data.frame(stat = rep("V-Shape Count", length(result$eps)),
                        eps = result$eps,
                        Hat = rep(wasserstein1d(vs.true, vs.hat), length(result$eps)),
                        Hat2 = rep(wasserstein1d(vs.true2, vs.hat2), length(result$eps)),
@@ -394,6 +402,23 @@ GRAND.evaluate.vshape <- function(result) {
   return(vs.mat)
 }
 
+GRAND.evaluate.triangle <- function(result) {
+  tri.true <- log(1 + count_triangles(result$non.private.result$g1))
+  tri.hat <- log(1 + count_triangles(result$non.private.result$g1.hat))
+  tri.true2 <- log(1 + count_triangles(result$non.private.result$g2))
+  tri.hat2 <- log(1 + count_triangles(result$non.private.result$g2.hat))
+  tri.grand <- lapply(result$GRAND.result, function(x) log(1 + count_triangles(x$g1.grand)))
+  tri.lap <- lapply(result$Laplace.result, function(x) log(1 + count_triangles(x$g1.Lap)))
+  tri.mat <- data.frame(stat = rep("Triangle Count", length(result$eps)),
+                        eps = result$eps,
+                        Hat = rep(wasserstein1d(tri.true, tri.hat), length(result$eps)),
+                        Hat2 = rep(wasserstein1d(tri.true2, tri.hat2), length(result$eps)),
+                        GRAND = unlist(lapply(tri.grand, function(x) wasserstein1d(tri.true, x))),
+                        Laplace = unlist(lapply(tri.lap, function(x) wasserstein1d(tri.true, x))))
+
+  return(tri.mat)
+}
+
 GRAND.evaluate.eigen <- function(result) {
   eigen.true <- eigen_centrality(result$non.private.result$g1)$vector
   eigen.hat <- eigen_centrality(result$non.private.result$g1.hat)$vector
@@ -401,7 +426,7 @@ GRAND.evaluate.eigen <- function(result) {
   eigen.hat2 <- eigen_centrality(result$non.private.result$g2.hat)$vector
   eigen.grand <- lapply(result$GRAND.result, function(x) eigen_centrality(x$g1.grand)$vector)
   eigen.lap <- lapply(result$Laplace.result, function(x) eigen_centrality(x$g1.Lap)$vector)
-  eigen.mat <- data.frame(metric = rep("Eigen Centrality", length(result$eps)),
+  eigen.mat <- data.frame(stat = rep("Eigen Centrality", length(result$eps)),
                           eps = result$eps,
                           Hat = rep(wasserstein1d(eigen.true, eigen.hat), length(result$eps)),
                           Hat2 = rep(wasserstein1d(eigen.true2, eigen.hat2), length(result$eps)),
@@ -419,7 +444,7 @@ GRAND.evaluate.harmonic <- function(result) {
   harmonic.hat2 <- harmonic_centrality(result$non.private.result$g2.hat)
   harmonic.grand <- lapply(result$GRAND.result, function(x) harmonic_centrality(x$g1.grand))
   harmonic.lap <- lapply(result$Laplace.result, function(x) harmonic_centrality(x$g1.Lap))
-  harmonic.mat <- data.frame(metric = rep("Harmonic Centrality", length(result$eps)),
+  harmonic.mat <- data.frame(stat = rep("Harmonic Centrality", length(result$eps)),
                              eps = result$eps,
                              Hat = rep(wasserstein1d(harmonic.true, harmonic.hat), length(result$eps)),
                              Hat2 = rep(wasserstein1d(harmonic.true2, harmonic.hat2), length(result$eps)),
@@ -437,23 +462,35 @@ get.v <- function(g) {
   return(twostar_counts)
 }
 
-#' Evaluate GRAND Results
+#' GRAND Evaluation of Network Data
 #'
-#' @title Evaluate GRAND Privatization Results
+#' @title GRAND Evaluation of Network Data
 #' @description Evaluates the quality of GRAND privatization results by comparing
 #' various network statistics between the original and privatized networks using
 #' Wasserstein distance.
 #' @param result List. Output from GRAND.privatize function containing privatization results.
 #' @param statistics Character vector. Network statistics to evaluate. Options include:
-#' "degree", "triangle", "vshape", "eigen", "harmonic". Default is all statistics.
+#' "degree" (Node Degree), "vshape" (V-Shape Count), "triangle" (Triangle Count), "eigen" (Eigen Centrality), "harmonic" (Harmonic Centrality). Default is all statistics.
+#' @details 
+#'   This function evaluates privatization quality by comparing network statistics between 
+#'   original and privatized networks using Wasserstein-1 distance. The evaluation covers:
+#'   \itemize{
+#'     \item \strong{Hat}: Performance on release set (without privacy)
+#'     \item \strong{Hat2}: Performance on holdout set (without privacy)
+#'     \item \strong{GRAND}: Performance of GRAND privatization method
+#'     \item \strong{Laplace}: Performance of standard Laplace mechanism
+#'   }
+#'   Lower Wasserstein distances indicate better utility preservation.
+#'
+#'   For more details, see the "simulation experiments" section of Liu, Bi, and Li (2025).
 #' @return A data frame containing evaluation results with columns:
 #' \itemize{
-#'   \item metric: Type of network statistic evaluated
-#'   \item eps: Privacy parameter used
-#'   \item Hat: Wasserstein distance for non-private estimation
+#'   \item stat: Type of network statistic(s) evaluated
+#'   \item eps: Privacy budget parameter(s) used
+#'   \item Hat: Wasserstein distance for release set estimation
 #'   \item Hat2: Wasserstein distance for holdout set estimation
-#'   \item GRAND: Wasserstein distance for GRAND privatization
-#'   \item Laplace: Wasserstein distance for Laplace mechanism
+#'   \item GRAND: Wasserstein distance for GRAND privatization method
+#'   \item Laplace: Wasserstein distance for standard Laplace mechanism
 #' }
 #' @references 
 #'   S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 
@@ -461,16 +498,16 @@ get.v <- function(g) {
 #' @export
 #' @examples
 #' # Generate and privatize a network
-#' dt <- LSM.Gen(n = 500, k = 2, K = 3)
-#' result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
+#' network <- LSM.Gen(n = 500, k = 2, K = 3)
+#' result <- GRAND.privatize(A = network$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10), model = "LSM")
 #' # Evaluate results for all statistics
-#' eval_results <- GRAND.evaluate(result)
+#' evaluation <- GRAND.evaluate(result)
 #' # Evaluate only degree and triangle statistics
-#' eval_results <- GRAND.evaluate(result, statistics = c("degree", "triangle"))
-GRAND.evaluate <- function(result, statistics = c("degree", "triangle", "vshape", "eigen", "harmonic")) {
+#' evaluation_subset <- GRAND.evaluate(result, statistics = c("degree", "triangle"))
+GRAND.evaluate <- function(result, statistics = c("degree", "vshape", "triangle", "eigen", "harmonic")) {
   statistic_funcs <- list(degree = GRAND.evaluate.degree,
-                          triangle = GRAND.evaluate.triangle,
                           vshape = GRAND.evaluate.vshape,
+                          triangle = GRAND.evaluate.triangle,
                           eigen = GRAND.evaluate.eigen,
                           harmonic = GRAND.evaluate.harmonic)
 

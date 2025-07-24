@@ -2,28 +2,28 @@
 % Please edit documentation in R/GRAND.R
 \name{GRAND.evaluate}
 \alias{GRAND.evaluate}
-\title{Evaluate GRAND Privatization Results}
+\title{GRAND Evaluation of Network Data}
 \usage{
 GRAND.evaluate(
   result,
-  statistics = c("degree", "triangle", "vshape", "eigen", "harmonic")
+  statistics = c("degree", "vshape", "triangle", "eigen", "harmonic")
 )
 }
 \arguments{
 \item{result}{List. Output from GRAND.privatize function containing privatization results.}
 
 \item{statistics}{Character vector. Network statistics to evaluate. Options include:
-"degree", "triangle", "vshape", "eigen", "harmonic". Default is all statistics.}
+"degree" (Node Degree), "vshape" (V-Shape Count), "triangle" (Triangle Count), "eigen" (Eigen Centrality), "harmonic" (Harmonic Centrality). Default is all statistics.}
 }
 \value{
 A data frame containing evaluation results with columns:
 \itemize{
-  \item metric: Type of network statistic evaluated
-  \item eps: Privacy parameter used
-  \item Hat: Wasserstein distance for non-private estimation
+  \item stat: Type of network statistic(s) evaluated
+  \item eps: Privacy budget parameter(s) used
+  \item Hat: Wasserstein distance for release set estimation
   \item Hat2: Wasserstein distance for holdout set estimation
-  \item GRAND: Wasserstein distance for GRAND privatization
-  \item Laplace: Wasserstein distance for Laplace mechanism
+  \item GRAND: Wasserstein distance for GRAND privatization method
+  \item Laplace: Wasserstein distance for standard Laplace mechanism
 }
 }
 \description{
@@ -32,16 +32,29 @@ various network statistics between the original and privatized networks using
 Wasserstein distance.
 }
 \details{
-Evaluate GRAND Results
+GRAND Evaluation of Network Data
+
+
+  This function evaluates privatization quality by comparing network statistics between 
+  original and privatized networks using Wasserstein-1 distance. The evaluation covers:
+  \itemize{
+    \item \strong{Hat}: Performance on release set (without privacy)
+    \item \strong{Hat2}: Performance on holdout set (without privacy)
+    \item \strong{GRAND}: Performance of GRAND privatization method
+    \item \strong{Laplace}: Performance of standard Laplace mechanism
+  }
+  Lower Wasserstein distances indicate better utility preservation.
+
+  For more details, see the "simulation experiments" section of Liu, Bi, and Li (2025).
 }
 \examples{
 # Generate and privatize a network
-dt <- LSM.Gen(n = 500, k = 2, K = 3)
-result <- GRAND.privatize(A = dt$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10))
+network <- LSM.Gen(n = 500, k = 2, K = 3)
+result <- GRAND.privatize(A = network$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10), model = "LSM")
 # Evaluate results for all statistics
-eval_results <- GRAND.evaluate(result)
+evaluation <- GRAND.evaluate(result)
 # Evaluate only degree and triangle statistics
-eval_results <- GRAND.evaluate(result, statistics = c("degree", "triangle"))
+evaluation_subset <- GRAND.evaluate(result, statistics = c("degree", "triangle"))
 }
 \references{
 S. Liu, X. Bi, and T. Li. GRAND: Graph Release with Assured Node Differential Privacy. 

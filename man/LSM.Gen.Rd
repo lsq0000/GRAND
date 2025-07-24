@@ -37,20 +37,22 @@ Generate Latent Space Model Network
 
   The Latent Space Model generates networks based on the following process:
   \enumerate{
-    \item Node-specific intercept parameters: \eqn{\alpha_i \sim \text{Unif}(1, 3)}, then transformed as \eqn{\alpha_i = -\alpha_i/2}
+    \item Node-specific intercept parameters: \eqn{\alpha_i \sim \mathsf{Unif}(1, 3)}, then transformed as \eqn{\alpha_i = -\alpha_i/2}
     \item Community assignments: Each node is randomly assigned to one of K communities with equal probability
-    \item Latent positions: \eqn{Z_i \sim \text{MVN}(\mu_{g_i}, I_k)} where \eqn{\mu_{g_i}} is the community center for node i's community
-    \item Community centers: \eqn{\mu_g} sampled uniformly on a sphere of radius 3 in k-dimensional space
-    \item Edge probabilities: \deqn{P_{ij} = \text{logit}^{-1}(\alpha_i + \alpha_j + Z_i^T Z_j) = \frac{1}{1 + \exp(-(\alpha_i + \alpha_j + Z_i^T Z_j))}}
-    \item Adjacency matrix: \eqn{A_{ij} \sim \text{Bernoulli}(P_{ij})} for \eqn{i < j}, with \eqn{A_{ii} = 0}
+    \item Community centers: \eqn{\mu_g} sampled uniformly from \eqn{[-1, 1]^k} hypercube
+    \item Latent positions: \eqn{Z_i \sim \mathcal{N}_{[-2, 2]}(\mu_{g_i}, I_k)} where \eqn{\mu_{g_i}} is the community center for node i's community
+    \item Edge probabilities: \deqn{P_{ij} = \text{logit}^{-1}(\alpha_i + \alpha_j + Z_i^\top Z_j) = \frac{1}{1 + \exp(-(\alpha_i + \alpha_j + Z_i^\top Z_j))}}
+    \item Adjacency matrix: \eqn{A_{ij} \sim \mathsf{Bern}(P_{ij})} for \eqn{i < j}, with \eqn{A_{ii} = 0} and \eqn{A_{ji} = A_{ij}}
   }
-  If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average degree.
+  If \code{avg.d} is specified, the edge probabilities are scaled to achieve the target average node degree.
+  
+  For more details, see the "simulation studies" section of Ma, Ma, and Yuan (2020), noting that our implementation has slight differences.
 }
 \examples{
 # Generate a network with 500 nodes, 2D latent space, 3 communities
-result <- LSM.Gen(n = 500, k = 2, K = 3)
+network <- LSM.Gen(n = 500, k = 2, K = 3)
 # Generate with target average degree of 50
-result <- LSM.Gen(n = 500, k = 2, K = 3, avg.d = 50)
+network2 <- LSM.Gen(n = 500, k = 2, K = 3, avg.d = 50)
 }
 \references{
 P. D. Hoff, A. E. Raftery, and M. S. Handcock. Latent space approaches to social network analysis. 
