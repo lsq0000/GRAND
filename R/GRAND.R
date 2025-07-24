@@ -75,10 +75,12 @@ Add.Laplace <- function(X, eps = 1) {
 #'   arXiv preprint arXiv:2507.00402, 2025.
 #' @export
 #' @examples
+#' \donttest{
 #' # Generate a network with 500 nodes, 2D latent space, 3 communities
 #' network <- LSM.Gen(n = 500, k = 2, K = 3)
 #' # Generate with target average degree of 50
 #' network2 <- LSM.Gen(n = 500, k = 2, K = 3, avg.d = 50)
+#' }
 LSM.Gen <- function(n, k, K, avg.d = NULL) {
   alpha <- runif(n, 1, 3)
   alpha <- -alpha / 2
@@ -255,10 +257,12 @@ GRAND.estimate <- function(A, K, holdout.index, release.index, model = c("LSM", 
 #'   arXiv preprint arXiv:2507.00402, 2025.
 #' @export
 #' @examples
+#' \donttest{
 #' # Generate a sample network
 #' network <- LSM.Gen(n = 500, k = 2, K = 3)
 #' # Privatize the first 250 nodes with epsilon = 1, 2, 5, 10
 #' result <- GRAND.privatize(A = network$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10), model = "LSM")
+#' }
 GRAND.privatize <- function(A, K, idx, eps = 1, model = c("LSM", "RDPG"), niter = 500, rho = 0.05) {
   model <- match.arg(model)
 
@@ -497,6 +501,7 @@ get.v <- function(g) {
 #'   arXiv preprint arXiv:2507.00402, 2025.
 #' @export
 #' @examples
+#' \donttest{
 #' # Generate and privatize a network
 #' network <- LSM.Gen(n = 500, k = 2, K = 3)
 #' result <- GRAND.privatize(A = network$A, K = 2, idx = 1:250, eps = c(1, 2, 5, 10), model = "LSM")
@@ -504,6 +509,7 @@ get.v <- function(g) {
 #' evaluation <- GRAND.evaluate(result)
 #' # Evaluate only degree and triangle statistics
 #' evaluation_subset <- GRAND.evaluate(result, statistics = c("degree", "triangle"))
+#' }
 GRAND.evaluate <- function(result, statistics = c("degree", "vshape", "triangle", "eigen", "harmonic")) {
   statistic_funcs <- list(degree = GRAND.evaluate.degree,
                           vshape = GRAND.evaluate.vshape,
