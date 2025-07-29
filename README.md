@@ -2,7 +2,7 @@
 
 ## Overview
 
-**GRANDpriv** (**G**raph **R**elease with **A**ssured **N**ode **D**ifferential privacy) is an R package that implements a novel method for privatizing network data using differential privacy. The package provides functions for generating synthetic networks based on LSM (Latent Space Model), applying differential privacy to network latent positions to achieve overall network privatization, and evaluating the utility of privatized networks through various network statistics. The privatize and evaluate functions support both LSM and RDPG (Random Dot Product Graph). For generating RDPG networks, users are encouraged to use the [`randnet`](https://CRAN.R-project.org/package=randnet) package.
+**GRANDpriv** (**G**raph **R**elease with **A**ssured **N**ode **D**ifferential **priv**acy) is an R package that implements a novel method for privatizing network data using differential privacy. The package provides functions for generating synthetic networks based on LSM (Latent Space Model), applying differential privacy to network latent positions to achieve overall network privatization, and evaluating the utility of privatized networks through various network statistics. The privatize and evaluate functions support both LSM and RDPG (Random Dot Product Graph). For generating RDPG networks, users are encouraged to use the [`randnet`](https://CRAN.R-project.org/package=randnet) package.
 
 ## Installation
 

@@ -7,11 +7,9 @@
 \packageTitle{GRANDpriv}
 }
 \description{
-\packageDescription{GRANDpriv}
+\strong{GRANDpriv} (\strong{G}raph \strong{R}elease with \strong{A}ssured \strong{N}ode \strong{D}ifferential \strong{priv}acy) is an R package that implements a novel method for privatizing network data using differential privacy. The package provides functions for generating synthetic networks based on LSM (Latent Space Model), applying differential privacy to network latent positions to achieve overall network privatization, and evaluating the utility of privatized networks through various network statistics. The privatize and evaluate functions support both LSM and RDPG (Random Dot Product Graph). For generating RDPG networks, users are encouraged to use the \strong{randnet} package.
 }
 \details{
-\strong{GRANDpriv} (\strong{G}raph \strong{R}elease with \strong{A}ssured \strong{N}ode \strong{D}ifferential privacy) is an R package that implements a novel method for privatizing network data using differential privacy. The package provides functions for generating synthetic networks based on LSM (Latent Space Model), applying differential privacy to network latent positions to achieve overall network privatization, and evaluating the utility of privatized networks through various network statistics. The privatize and evaluate functions support both LSM and RDPG (Random Dot Product Graph). For generating RDPG networks, users are encouraged to use the \strong{randnet} package.
-
 The package implements a two-step approach:
 \enumerate{
   \item \strong{Latent Position Estimation}: Estimates latent positions from the network structure using either LSM.PGD (Projected Gradient Descent, for LSM) or ASE (Adjacency Spectral Embedding, for RDPG)
