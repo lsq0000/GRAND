@@ -1,16 +1,16 @@
-# GRAND: Graph Release with Assured Node Differential Privacy
+# GRANDpriv: Graph Release with Assured Node Differential Privacy
 
 ## Overview
 
-**GRAND** (**G**raph **R**elease with **A**ssured **N**ode **D**ifferential privacy) is an R package that implements a novel method for privatizing network data using differential privacy. The package provides functions for generating synthetic networks based on LSM (Latent Space Model), applying differential privacy to network latent positions to achieve overall network privatization, and evaluating the utility of privatized networks through various network statistics. The privatize and evaluate functions support both LSM and RDPG (Random Dot Product Graph). For generating RDPG networks, users are encouraged to use the [`randnet`](https://cran.r-project.org/web/packages/randnet/) package.
+**GRANDpriv** (**G**raph **R**elease with **A**ssured **N**ode **D**ifferential privacy) is an R package that implements a novel method for privatizing network data using differential privacy. The package provides functions for generating synthetic networks based on LSM (Latent Space Model), applying differential privacy to network latent positions to achieve overall network privatization, and evaluating the utility of privatized networks through various network statistics. The privatize and evaluate functions support both LSM and RDPG (Random Dot Product Graph). For generating RDPG networks, users are encouraged to use the [`randnet`](https://CRAN.R-project.org/package=randnet) package.
 
 ## Installation
 
 ### From CRAN (Stable Version)
 
 ```r
-# Install GRAND from CRAN
-install.packages("GRAND")
+# Install GRANDpriv from CRAN
+install.packages("GRANDpriv")
 ```
 
 *Note: CRAN version is currently under review and not yet available. Please use the development version from GitHub.*
@@ -21,8 +21,8 @@ install.packages("GRAND")
 # Install devtools if you haven't already
 install.packages("devtools")
 
-# Install GRAND from GitHub
-devtools::install_github("lsq0000/GRAND")
+# Install GRANDpriv from GitHub
+devtools::install_github("lsq0000/GRANDpriv")
 ```
 
 ### Dependencies
@@ -41,7 +41,7 @@ The package requires the following R packages:
 ## Quick Start
 
 ```r
-library(GRAND)
+library(GRANDpriv)
 
 # Generate a sample network using Latent Space Model
 # Note: Use larger networks (n >= 500) for better stability
@@ -134,7 +134,7 @@ GPL (>= 3)
 
 ## Citation
 
-If you use GRAND in your research, please cite:
+If you use GRANDpriv in your research, please cite:
 
 ```bibtex
 @misc{liu2025grand,
