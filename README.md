@@ -134,7 +134,7 @@ GPL (>= 3)
 
 ## Citation
 
-If you use GRANDpriv in your research, please cite:
+If you use **GRANDpriv** in your research, please cite:
 
 ```bibtex
 @misc{liu2025grand,
